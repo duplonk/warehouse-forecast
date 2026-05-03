@@ -603,6 +603,7 @@ def main():
         st.caption(f"A = top {abc_a_pct}% of picks volume")
         st.caption(f"B = next {abc_b_pct}% of picks volume")
         st.caption(f"C = remaining {100 - abc_a_pct - abc_b_pct}%")
+        st.info("💡 Tip: set A items to 100% to apply the full model suite to all SKUs — useful when uploading a partial file such as a single brand or category.")
 
     # ── DATA INPUT ──
     st.markdown("<div class='section-header'>1. Load pick data</div>", unsafe_allow_html=True)
