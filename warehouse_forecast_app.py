@@ -495,26 +495,29 @@ def calculate_stock_levels(series, lead_time_days, replen_freq_days, abc_class, 
 
     # Stock level calculations
     if replen_freq_days == 0:  # Continuous
-        # Ideal = what you need to cover lead time + safety buffer
-        ideal_level = round(ensemble_forecast * lead_time_days + safety_stock, 1)
-        # Minimum = safety stock only (trigger replenishment here)
-        minimum_level = round(safety_stock, 1)
-        # Reorder point = demand during lead time + safety stock
-        # Should equal ideal level for continuous replenishment
-        reorder_point = round(ensemble_forecast * lead_time_days + safety_stock, 1)
-    else:
-        # Ideal = cover full replenishment cycle + safety stock
-        ideal_level = round(ensemble_forecast * (lead_time_days + replen_freq_days) + safety_stock, 1)
+        # Max = shelf quantity right after replenishment = lead time cover + safety stock
+        max_level = round(ensemble_forecast * lead_time_days + safety_stock, 1)
+        # Reorder point = safety stock — trigger immediately for continuous
+        reorder_point = round(safety_stock, 1)
         # Minimum = safety stock only
         minimum_level = round(safety_stock, 1)
-        # Reorder point = demand during full cycle (lead time + freq) + safety stock
-        # Must trigger early enough to never stockout before next scheduled replenishment
-        reorder_point = round(ensemble_forecast * (lead_time_days + replen_freq_days) + safety_stock, 1)
+        # Ideal = average of max and reorder point (avg shelf level during normal operation)
+        ideal_level = round((max_level + reorder_point) / 2, 1)
+    else:
+        # Max = shelf quantity right after replenishment = full cycle cover + safety stock
+        max_level = round(ensemble_forecast * (lead_time_days + replen_freq_days) + safety_stock, 1)
+        # Reorder point = demand during lead time + safety stock
+        reorder_point = round(ensemble_forecast * lead_time_days + safety_stock, 1)
+        # Minimum = safety stock only
+        minimum_level = round(safety_stock, 1)
+        # Ideal = average of max and reorder point
+        ideal_level = round((max_level + reorder_point) / 2, 1)
 
     return {
         'avg_daily_picks': round(avg_daily, 2),
         'std_daily': round(std_daily, 2),
         'ensemble_forecast': round(ensemble_forecast, 2),
+        'max_level': max(max_level, 1),
         'ideal_level': max(ideal_level, 1),
         'minimum_level': max(minimum_level, 1),
         'reorder_point': max(reorder_point, 1),
@@ -765,6 +768,7 @@ def main():
                 'ABC': abc_class,
                 'Avg Daily Picks': levels['avg_daily_picks'],
                 'Ensemble Forecast': levels['ensemble_forecast'],
+                'Max Level': levels['max_level'],
                 'Ideal Level': levels['ideal_level'],
                 'Minimum Level': levels['minimum_level'],
                 'Reorder Point': levels['reorder_point'],
@@ -812,6 +816,7 @@ def main():
             .format({
                 'Avg Daily Picks': '{:.1f}',
                 'Ensemble Forecast': '{:.1f}',
+                'Max Level': '{:.0f}',
                 'Ideal Level': '{:.0f}',
                 'Minimum Level': '{:.0f}',
                 'Reorder Point': '{:.0f}',
@@ -824,12 +829,11 @@ def main():
         # Summary stats
         col1, col2, col3, col4 = st.columns(4)
         with col1:
-            st.metric("Avg Ideal Level", f"{filtered['Ideal Level'].mean():.0f} units")
+            st.metric("Avg Max Level", f"{filtered['Max Level'].mean():.0f} units")
         with col2:
-            st.metric("Avg Reorder Point", f"{filtered['Reorder Point'].mean():.0f} units")
+            st.metric("Avg Ideal Level", f"{filtered['Ideal Level'].mean():.0f} units")
         with col3:
-            total_ideal = filtered['Ideal Level'].sum()
-            st.metric("Total Ideal Stock", f"{total_ideal:,.0f} units")
+            st.metric("Avg Reorder Point", f"{filtered['Reorder Point'].mean():.0f} units")
         with col4:
             flagged = (filtered['Model Agreement (CV%)'] > 30).sum()
             st.metric("SKUs needing review", f"{flagged}")
@@ -848,14 +852,16 @@ def main():
             sku_full = sku_indexed.reindex(date_range).fillna(0)
             series = sku_data['Units_Picked'].values
 
-            col1, col2, col3, col4 = st.columns(4)
+            col1, col2, col3, col4, col5 = st.columns(5)
             with col1:
                 st.metric("ABC Class", sku_row['ABC'])
             with col2:
-                st.metric("Ideal Level", f"{sku_row['Ideal Level']:.0f} units")
+                st.metric("Max Level", f"{sku_row['Max Level']:.0f} units")
             with col3:
-                st.metric("Minimum Level", f"{sku_row['Minimum Level']:.0f} units")
+                st.metric("Ideal Level", f"{sku_row['Ideal Level']:.0f} units")
             with col4:
+                st.metric("Minimum Level", f"{sku_row['Minimum Level']:.0f} units")
+            with col5:
                 st.metric("Reorder Point", f"{sku_row['Reorder Point']:.0f} units")
 
             # Chart
@@ -863,13 +869,14 @@ def main():
             chart_df = pd.DataFrame({
                 'Date': date_range,
                 'Daily Picks': series,
+                'Max Level': sku_row['Max Level'],
                 'Ideal Level': sku_row['Ideal Level'],
                 'Reorder Point': sku_row['Reorder Point'],
                 'Minimum Level': sku_row['Minimum Level'],
             }).set_index('Date')
 
-            st.line_chart(chart_df, color=["#378ADD", "#2ecc71", "#e67e22", "#e74c3c"])
-            st.caption("Blue = daily picks · Green = ideal level · Orange = reorder point · Red = minimum level")
+            st.line_chart(chart_df, color=["#378ADD", "#2C2416", "#E9A43A", "#C4B99A", "#e74c3c"])
+            st.caption("Blue = daily picks · Dark = max level · Amber = ideal level · Tan = reorder point · Red = minimum level")
 
             # Models breakdown
             if sku_row['ABC'] in ['A', 'B']:
@@ -897,8 +904,8 @@ def main():
                 use_container_width=True
             )
         with col2:
-            wms_df = filtered[['SKU', 'Minimum Level', 'Reorder Point', 'Ideal Level']].copy()
-            wms_df.columns = ['sku_code', 'min_qty', 'reorder_qty', 'max_qty']
+            wms_df = filtered[['SKU', 'Minimum Level', 'Reorder Point', 'Ideal Level', 'Max Level']].copy()
+            wms_df.columns = ['sku_code', 'min_qty', 'reorder_qty', 'ideal_qty', 'max_qty']
             wms_csv = wms_df.to_csv(index=False)
             st.download_button(
                 "⬇️ Download WMS upload file",
