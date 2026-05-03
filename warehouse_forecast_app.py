@@ -465,37 +465,38 @@ def main():
         st.markdown("<br>", unsafe_allow_html=True)
         use_sample = st.button("📊 Use sample data", use_container_width=True)
 
-    df = None
     single_sku_mode = False
 
     if use_sample:
-        df = generate_sample_data()
-        st.success(f"Sample data loaded — {len(df):,} records, {df['SKU'].nunique()} SKUs")
+        st.session_state['df'] = generate_sample_data()
+        st.session_state['data_label'] = f"Sample data loaded — {len(st.session_state['df']):,} records, {st.session_state['df']['SKU'].nunique()} SKUs"
 
     elif uploaded_file is not None:
         try:
             df_raw = pd.read_csv(uploaded_file)
             df_raw.columns = [c.strip() for c in df_raw.columns]
-
-            # Detect format
             if 'SKU' in df_raw.columns and 'Units_Picked' in df_raw.columns:
-                df = df_raw[['Date', 'SKU', 'Units_Picked']].copy()
-                df['Units_Picked'] = pd.to_numeric(df['Units_Picked'], errors='coerce').fillna(0)
-                st.success(f"Loaded {len(df):,} records across {df['SKU'].nunique()} SKUs")
-
+                loaded = df_raw[['Date', 'SKU', 'Units_Picked']].copy()
+                loaded['Units_Picked'] = pd.to_numeric(loaded['Units_Picked'], errors='coerce').fillna(0)
+                st.session_state['df'] = loaded
+                st.session_state['data_label'] = f"Loaded {len(loaded):,} records across {loaded['SKU'].nunique()} SKUs"
             elif 'Units_Sold' in df_raw.columns or 'Units_Picked' in df_raw.columns:
-                # Single SKU file
                 pick_col = 'Units_Picked' if 'Units_Picked' in df_raw.columns else 'Units_Sold'
-                df = df_raw[['Date', pick_col]].copy()
-                df.columns = ['Date', 'Units_Picked']
-                df['SKU'] = 'SKU-001'
-                df['Units_Picked'] = pd.to_numeric(df['Units_Picked'], errors='coerce').fillna(0)
+                loaded = df_raw[['Date', pick_col]].copy()
+                loaded.columns = ['Date', 'Units_Picked']
+                loaded['SKU'] = 'SKU-001'
+                loaded['Units_Picked'] = pd.to_numeric(loaded['Units_Picked'], errors='coerce').fillna(0)
                 single_sku_mode = True
-                st.success(f"Single-SKU file loaded — {len(df):,} daily records")
+                st.session_state['df'] = loaded
+                st.session_state['data_label'] = f"Single-SKU file — {len(loaded):,} daily records"
             else:
                 st.error("Could not detect columns. Need: Date + SKU + Units_Picked, or Date + Units_Picked")
         except Exception as e:
             st.error(f"Error reading file: {e}")
+
+    df = st.session_state.get('df', None)
+    if st.session_state.get('data_label'):
+        st.success(st.session_state['data_label'])
 
     if df is None:
         st.info("Upload a CSV or use the sample data to get started.")
