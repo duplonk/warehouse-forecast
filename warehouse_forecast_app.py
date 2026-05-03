@@ -44,6 +44,14 @@ st.markdown("""
     [data-testid="stSidebar"] span {
         color: #C4B99A !important;
     }
+    [data-testid="stSidebar"] .stSelectbox div[data-baseweb="select"] span,
+    [data-testid="stSidebar"] .stSelectbox div[data-baseweb="select"] div {
+        color: #F5F0E8 !important;
+    }
+    [data-testid="stSidebar"] input,
+    [data-testid="stSidebar"] select {
+        color: #F5F0E8 !important;
+    }
     [data-testid="stSidebar"] h1,
     [data-testid="stSidebar"] h2,
     [data-testid="stSidebar"] h3 {
