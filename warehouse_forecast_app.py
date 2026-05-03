@@ -856,7 +856,7 @@ def main():
             date_range = pd.date_range(sku_data['Date'].min(), sku_data['Date'].max(), freq='D')
             sku_indexed = sku_data.set_index('Date')[['Units_Picked']]
             sku_full = sku_indexed.reindex(date_range).fillna(0)
-            series = sku_data['Units_Picked'].values
+            series = sku_full['Units_Picked'].values
 
             col1, col2, col3, col4, col5 = st.columns(5)
             with col1:
