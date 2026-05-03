@@ -507,8 +507,9 @@ def calculate_stock_levels(series, lead_time_days, replen_freq_days, abc_class, 
         ideal_level = round(ensemble_forecast * (lead_time_days + replen_freq_days) + safety_stock, 1)
         # Minimum = safety stock only
         minimum_level = round(safety_stock, 1)
-        # Reorder point = demand during lead time + safety stock
-        reorder_point = round(ensemble_forecast * lead_time_days + safety_stock, 1)
+        # Reorder point = demand during full cycle (lead time + freq) + safety stock
+        # Must trigger early enough to never stockout before next scheduled replenishment
+        reorder_point = round(ensemble_forecast * (lead_time_days + replen_freq_days) + safety_stock, 1)
 
     return {
         'avg_daily_picks': round(avg_daily, 2),
@@ -576,7 +577,7 @@ def main():
         replen_options = {"Continuous": 0, "Every 1 day": 1, "Every 2 days": 2, "Every 3 days": 3, "Custom": None}
         replen_choice = st.selectbox("Replenishment Frequency", list(replen_options.keys()))
         if replen_choice == "Custom":
-            replen_freq_days = st.number_input("Frequency (days)", min_value=1, max_value=14, value=1)
+            replen_freq_days = st.number_input("Frequency (days)", min_value=1, max_value=30, value=1)
         else:
             replen_freq_days = replen_options[replen_choice]
 
