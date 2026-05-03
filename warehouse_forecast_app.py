@@ -605,7 +605,8 @@ def main():
             sku_data = df[df['SKU'] == sku].sort_values('Date')
             # Fill missing dates with 0
             date_range = pd.date_range(sku_data['Date'].min(), sku_data['Date'].max(), freq='D')
-            sku_full = sku_data.set_index('Date').reindex(date_range, fill_value=0)
+            sku_indexed = sku_data.set_index('Date')[['Units_Picked']]
+            sku_full = sku_indexed.reindex(date_range).fillna(0)
             series = sku_full['Units_Picked'].values
 
             abc_class = sku_abc_dict.get(sku, 'C')
@@ -695,7 +696,8 @@ def main():
             sku_row = filtered[filtered['SKU'] == selected_sku].iloc[0]
             sku_data = df[df['SKU'] == selected_sku].sort_values('Date')
             date_range = pd.date_range(sku_data['Date'].min(), sku_data['Date'].max(), freq='D')
-            sku_full = sku_data.set_index('Date').reindex(date_range, fill_value=0)
+            sku_indexed = sku_data.set_index('Date')[['Units_Picked']]
+            sku_full = sku_indexed.reindex(date_range).fillna(0)
             series = sku_full['Units_Picked'].values
 
             col1, col2, col3, col4 = st.columns(4)
