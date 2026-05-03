@@ -20,27 +20,146 @@ warnings.filterwarnings('ignore')
 # PAGE CONFIG
 # ─────────────────────────────────────────────
 st.set_page_config(
-    page_title="Warehouse Demand Forecasting",
-    page_icon="📦",
+    page_title="The Oracle — Demand Planning",
+    page_icon="🔮",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
 st.markdown("""
 <style>
-    .metric-card {
-        background: #f8f9fa;
-        border-radius: 8px;
-        padding: 1rem 1.25rem;
-        border: 1px solid #e9ecef;
+    /* ── THE ORACLE — Industrial Theme ── */
+    [data-testid="stAppViewContainer"] {
+        background-color: #F5F0E8;
     }
-    .state-low { color: #378ADD; font-weight: 600; }
-    .state-med { color: #BA7517; font-weight: 600; }
-    .state-high { color: #A32D2D; font-weight: 600; }
-    .abc-a { background: #fdecea; color: #A32D2D; padding: 2px 8px; border-radius: 4px; font-weight: 600; font-size: 12px; }
-    .abc-b { background: #fff8e1; color: #BA7517; padding: 2px 8px; border-radius: 4px; font-weight: 600; font-size: 12px; }
-    .abc-c { background: #e8f4fd; color: #378ADD; padding: 2px 8px; border-radius: 4px; font-weight: 600; font-size: 12px; }
-    .section-header { font-size: 1.1rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.5rem; color: #2c3e50; }
+    [data-testid="stSidebar"] {
+        background-color: #2C2416 !important;
+    }
+    [data-testid="stSidebar"] * {
+        color: #F5F0E8 !important;
+    }
+    [data-testid="stSidebar"] .stSelectbox label,
+    [data-testid="stSidebar"] .stSlider label,
+    [data-testid="stSidebar"] p,
+    [data-testid="stSidebar"] span {
+        color: #C4B99A !important;
+    }
+    [data-testid="stSidebar"] h1,
+    [data-testid="stSidebar"] h2,
+    [data-testid="stSidebar"] h3 {
+        color: #F5F0E8 !important;
+    }
+    .oracle-header {
+        background: #2C2416;
+        padding: 1.5rem 2rem;
+        margin: -1rem -1rem 2rem -1rem;
+        border-bottom: 3px solid #E9A43A;
+    }
+    .oracle-title {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: #F5F0E8;
+        margin: 0;
+        letter-spacing: -0.02em;
+    }
+    .oracle-title span {
+        color: #E9A43A;
+    }
+    .oracle-subtitle {
+        font-size: 0.95rem;
+        color: #C4B99A;
+        margin: 0.25rem 0 0 0;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+    .oracle-badge {
+        display: inline-block;
+        background: #E9A43A;
+        color: #2C2416;
+        font-size: 0.7rem;
+        font-weight: 700;
+        padding: 3px 10px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin-left: 1rem;
+        vertical-align: middle;
+    }
+    .metric-card {
+        background: #fff;
+        border-left: 4px solid #E9A43A;
+        border-radius: 0;
+        padding: 1rem 1.25rem;
+        border-top: 0.5px solid #C4B99A;
+        border-right: 0.5px solid #C4B99A;
+        border-bottom: 0.5px solid #C4B99A;
+    }
+    .metric-card .label {
+        font-size: 0.75rem;
+        color: #6B5B3E;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 0.25rem;
+    }
+    .metric-card .value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #2C2416;
+    }
+    .metric-card .sub {
+        font-size: 0.75rem;
+        color: #E9A43A;
+        font-weight: 600;
+    }
+    .abc-a { background: #E9A43A; color: #2C2416; padding: 2px 8px; font-weight: 700; font-size: 12px; }
+    .abc-b { background: #C4B99A; color: #2C2416; padding: 2px 8px; font-weight: 700; font-size: 12px; }
+    .abc-c { background: #EDE8DC; color: #6B5B3E; padding: 2px 8px; font-weight: 700; font-size: 12px; }
+    .section-header {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-top: 1.5rem;
+        margin-bottom: 0.5rem;
+        color: #2C2416;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 2px solid #E9A43A;
+        padding-bottom: 0.25rem;
+    }
+    .stButton > button {
+        background-color: #E9A43A !important;
+        color: #2C2416 !important;
+        font-weight: 700 !important;
+        border: none !important;
+        border-radius: 0 !important;
+        letter-spacing: 0.05em !important;
+        text-transform: uppercase !important;
+    }
+    .stButton > button:hover {
+        background-color: #2C2416 !important;
+        color: #E9A43A !important;
+    }
+    [data-testid="stMetricValue"] {
+        color: #2C2416 !important;
+        font-weight: 700 !important;
+    }
+    [data-testid="stMetricLabel"] {
+        color: #6B5B3E !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.05em !important;
+        font-size: 0.75rem !important;
+    }
+    .stDataFrame {
+        border: 0.5px solid #C4B99A !important;
+    }
+    div[data-testid="stSuccess"] {
+        background-color: #EDE8DC;
+        border-left: 4px solid #E9A43A;
+        color: #2C2416;
+    }
+    div[data-testid="stInfo"] {
+        background-color: #EDE8DC;
+        border-left: 4px solid #C4B99A;
+        color: #6B5B3E;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -415,15 +534,18 @@ def generate_sample_data():
 
 def main():
     # Header
-    st.title("📦 Warehouse Intra-Logistics Demand Forecasting")
-    st.markdown("*Calculates ideal levels, minimum levels and reorder points for pick shelf replenishment*")
-    st.divider()
+    st.markdown("""
+    <div class="oracle-header">
+        <p class="oracle-title">🔮 The <span>Oracle</span><span class="oracle-badge">Live</span></p>
+        <p class="oracle-subtitle">Demand planning for the masses &nbsp;·&nbsp; Bulk-to-pick replenishment intelligence</p>
+    </div>
+    """, unsafe_allow_html=True)
 
     # ── SIDEBAR ──
     with st.sidebar:
-        st.header("⚙️ Configuration")
-
-        st.subheader("Replenishment Parameters")
+        st.markdown("### ⚙️ Configuration")
+        st.markdown("---")
+        st.markdown("**Replenishment Parameters**")
         lead_time_options = {"1 day": 1, "2 days": 2, "3 days": 3, "5 days": 5, "Custom": None}
         lead_time_choice = st.selectbox("Lead Time", list(lead_time_options.keys()))
         if lead_time_choice == "Custom":
@@ -438,7 +560,8 @@ def main():
         else:
             replen_freq_days = replen_options[replen_choice]
 
-        st.subheader("Service Level")
+        st.markdown("---")
+        st.markdown("**Service Level**")
         service_level = st.select_slider(
             "Target service level",
             options=["90%", "95%", "98%", "99%"],
@@ -447,7 +570,8 @@ def main():
         service_factors = {"90%": 1.28, "95%": 1.65, "98%": 2.05, "99%": 2.33}
         service_factor = service_factors[service_level]
 
-        st.subheader("ABC Thresholds")
+        st.markdown("---")
+        st.markdown("**ABC Thresholds**")
         abc_a_pct = st.slider("A items — top % of volume", 60, 85, 80)
         abc_b_pct = st.slider("B items — next % of volume", 5, 20, 15)
 
@@ -457,7 +581,7 @@ def main():
         st.caption(f"C = remaining {100 - abc_a_pct - abc_b_pct}%")
 
     # ── DATA INPUT ──
-    st.subheader("1. Load Pick Data")
+    st.markdown("<div class='section-header'>1. Load pick data</div>", unsafe_allow_html=True)
 
     col1, col2 = st.columns([2, 1])
     with col1:
@@ -468,7 +592,7 @@ def main():
         )
     with col2:
         st.markdown("<br>", unsafe_allow_html=True)
-        use_sample = st.button("📊 Use sample data", use_container_width=True)
+        use_sample = st.button("📊 Load sample data", use_container_width=True)
 
     single_sku_mode = False
 
@@ -523,7 +647,7 @@ def main():
 
     # ── DATA OVERVIEW ──
     st.divider()
-    st.subheader("2. Data Overview")
+    st.markdown("<div class='section-header'>2. Data overview</div>", unsafe_allow_html=True)
 
     df['Date'] = pd.to_datetime(df['Date'])
     df['Units_Picked'] = pd.to_numeric(df['Units_Picked'], errors='coerce').fillna(0)
@@ -540,7 +664,7 @@ def main():
 
     # ── ABC CLASSIFICATION ──
     st.divider()
-    st.subheader("3. ABC Classification")
+    st.markdown("<div class='section-header'>3. ABC classification</div>", unsafe_allow_html=True)
 
     sku_summary = df.groupby('SKU').agg(
         total_picks=('Units_Picked', 'sum'),
@@ -565,36 +689,36 @@ def main():
     with col1:
         st.markdown(f"""
         <div class="metric-card">
-            <div style="font-size:13px; color:#666;">A items — High velocity</div>
-            <div style="font-size:28px; font-weight:700; color:#A32D2D;">{a_count}</div>
-            <div style="font-size:12px; color:#888;">{a_count/total*100:.0f}% of SKUs · Full model suite</div>
+            <div class="label">A items — High velocity</div>
+            <div class="value">{a_count}</div>
+            <div class="sub">{a_count/total*100:.0f}% of SKUs · Full model suite</div>
         </div>
         """, unsafe_allow_html=True)
     with col2:
         st.markdown(f"""
         <div class="metric-card">
-            <div style="font-size:13px; color:#666;">B items — Medium velocity</div>
-            <div style="font-size:28px; font-weight:700; color:#BA7517;">{b_count}</div>
-            <div style="font-size:12px; color:#888;">{b_count/total*100:.0f}% of SKUs · Holt-Winters + LR</div>
+            <div class="label">B items — Medium velocity</div>
+            <div class="value">{b_count}</div>
+            <div class="sub">{b_count/total*100:.0f}% of SKUs · Holt-Winters + LR</div>
         </div>
         """, unsafe_allow_html=True)
     with col3:
         st.markdown(f"""
         <div class="metric-card">
-            <div style="font-size:13px; color:#666;">C items — Low velocity</div>
-            <div style="font-size:28px; font-weight:700; color:#378ADD;">{c_count}</div>
-            <div style="font-size:12px; color:#888;">{c_count/total*100:.0f}% of SKUs · Average-based</div>
+            <div class="label">C items — Low velocity</div>
+            <div class="value">{c_count}</div>
+            <div class="sub">{c_count/total*100:.0f}% of SKUs · Average-based</div>
         </div>
         """, unsafe_allow_html=True)
 
     # ── RUN MODELS ──
     st.divider()
-    st.subheader("4. Run Forecast Models")
+    st.markdown("<div class='section-header'>4. Run forecast models</div>", unsafe_allow_html=True)
 
     replen_label = "Continuous" if replen_freq_days == 0 else f"Every {replen_freq_days} day(s)"
     st.markdown(f"**Settings:** Lead time = **{lead_time_days} day(s)** · Replenishment = **{replen_label}** · Service level = **{service_level}**")
 
-    if st.button("🚀 Run forecasting models", type="primary", use_container_width=True):
+    if st.button("⚡ Run The Oracle", type="primary", use_container_width=True):
         results_list = []
         sku_abc_dict = dict(zip(sku_abc['SKU'], sku_abc['abc']))
 
@@ -640,7 +764,7 @@ def main():
         results_df = st.session_state['results_df']
 
         st.divider()
-        st.subheader("5. Results")
+        st.markdown("<div class='section-header'>5. Results</div>", unsafe_allow_html=True)
 
         # Filter
         col1, col2 = st.columns([1, 3])
@@ -691,7 +815,7 @@ def main():
 
         # ── SKU DETAIL VIEW ──
         st.divider()
-        st.subheader("6. SKU Detail View")
+        st.markdown("<div class='section-header'>6. SKU detail view</div>", unsafe_allow_html=True)
 
         selected_sku = st.selectbox("Select SKU to inspect", filtered['SKU'].tolist())
 
@@ -739,13 +863,13 @@ def main():
 
         # ── EXPORT ──
         st.divider()
-        st.subheader("7. Export Results")
+        st.markdown("<div class='section-header'>7. Export results</div>", unsafe_allow_html=True)
 
         col1, col2 = st.columns(2)
         with col1:
             csv_out = filtered.to_csv(index=False)
             st.download_button(
-                "⬇️ Download results CSV",
+                "⬇️ Download full results",
                 data=csv_out,
                 file_name=f"warehouse_stock_levels_{datetime.now().strftime('%Y%m%d_%H%M')}.csv",
                 mime='text/csv',
