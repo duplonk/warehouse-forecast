@@ -73,16 +73,17 @@ st.markdown("""
         margin: -1rem -1rem 2rem -1rem;
         border-bottom: 3px solid #E9A43A;
     }
-    .oracle-title {
-        font-size: 3.8rem;
-        font-weight: 700;
-        color: #F5F0E8;
-        margin: 0;
-        letter-spacing: -0.03em;
-        line-height: 1;
+    h1.oracle-title, .oracle-title {
+        font-size: 3.8rem !important;
+        font-weight: 700 !important;
+        color: #F5F0E8 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        letter-spacing: -0.03em !important;
+        line-height: 1 !important;
     }
-    .oracle-title span {
-        color: #E9A43A;
+    h1.oracle-title span, .oracle-title span {
+        color: #E9A43A !important;
     }
     .oracle-subtitle {
         font-size: 0.85rem;
@@ -555,7 +556,7 @@ def main():
     # Header
     st.markdown("""
     <div class="oracle-header">
-        <p class="oracle-title">🔮 The <span>Oracle</span><span class="oracle-badge">Live</span></p>
+        <h1 class="oracle-title">🔮 The <span>Oracle</span><span class="oracle-badge">Live</span></h1>
         <p class="oracle-subtitle">Demand planning for the masses &nbsp;·&nbsp; Bulk-to-pick replenishment intelligence</p>
     </div>
     """, unsafe_allow_html=True)
