@@ -356,15 +356,20 @@ def calculate_stock_levels(series, lead_time_days, replen_freq_days, abc_class, 
 
     # Stock level calculations
     if replen_freq_days == 0:  # Continuous
-        cycle_stock = ensemble_forecast * lead_time_days
-        ideal_level = round(cycle_stock + safety_stock, 1)
+        # Ideal = what you need to cover lead time + safety buffer
+        ideal_level = round(ensemble_forecast * lead_time_days + safety_stock, 1)
+        # Minimum = safety stock only (trigger replenishment here)
         minimum_level = round(safety_stock, 1)
+        # Reorder point = demand during lead time + safety stock
+        # Should equal ideal level for continuous replenishment
         reorder_point = round(ensemble_forecast * lead_time_days + safety_stock, 1)
     else:
-        cycle_stock = ensemble_forecast * replen_freq_days
-        ideal_level = round(cycle_stock + safety_stock, 1)
+        # Ideal = cover full replenishment cycle + safety stock
+        ideal_level = round(ensemble_forecast * (lead_time_days + replen_freq_days) + safety_stock, 1)
+        # Minimum = safety stock only
         minimum_level = round(safety_stock, 1)
-        reorder_point = round(ensemble_forecast * (lead_time_days + replen_freq_days / 2) + safety_stock, 1)
+        # Reorder point = demand during lead time + safety stock
+        reorder_point = round(ensemble_forecast * lead_time_days + safety_stock, 1)
 
     return {
         'avg_daily_picks': round(avg_daily, 2),
@@ -603,11 +608,9 @@ def main():
             progress.progress((i+1)/n_skus)
 
             sku_data = df[df['SKU'] == sku].sort_values('Date')
-            # Fill missing dates with 0
+            # Use only days with actual picks — zeros from missing dates skew std
+            series = sku_data['Units_Picked'].values
             date_range = pd.date_range(sku_data['Date'].min(), sku_data['Date'].max(), freq='D')
-            sku_indexed = sku_data.set_index('Date')[['Units_Picked']]
-            sku_full = sku_indexed.reindex(date_range).fillna(0)
-            series = sku_full['Units_Picked'].values
 
             abc_class = sku_abc_dict.get(sku, 'C')
             levels = calculate_stock_levels(series, lead_time_days, replen_freq_days, abc_class, service_factor)
@@ -698,7 +701,7 @@ def main():
             date_range = pd.date_range(sku_data['Date'].min(), sku_data['Date'].max(), freq='D')
             sku_indexed = sku_data.set_index('Date')[['Units_Picked']]
             sku_full = sku_indexed.reindex(date_range).fillna(0)
-            series = sku_full['Units_Picked'].values
+            series = sku_data['Units_Picked'].values
 
             col1, col2, col3, col4 = st.columns(4)
             with col1:
