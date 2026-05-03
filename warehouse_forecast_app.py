@@ -659,8 +659,8 @@ def main():
             return 'background-color: #fff3cd' if val > 30 else ''
 
         styled = filtered.style\
-            .applymap(color_abc, subset=['ABC'])\
-            .applymap(flag_disagreement, subset=['Model Agreement (CV%)'])\
+            .map(color_abc, subset=['ABC'])\
+            .map(flag_disagreement, subset=['Model Agreement (CV%)'])\
             .format({
                 'Avg Daily Picks': '{:.1f}',
                 'Ensemble Forecast': '{:.1f}',
