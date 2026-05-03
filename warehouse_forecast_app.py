@@ -46,11 +46,21 @@ st.markdown("""
     }
     [data-testid="stSidebar"] .stSelectbox div[data-baseweb="select"] span,
     [data-testid="stSidebar"] .stSelectbox div[data-baseweb="select"] div {
-        color: #F5F0E8 !important;
+        color: #2C2416 !important;
+        background-color: #E9A43A !important;
+    }
+    [data-testid="stSidebar"] div[data-baseweb="select"] > div {
+        background-color: #E9A43A !important;
+        border-color: #C4B99A !important;
+    }
+    [data-testid="stSidebar"] div[data-baseweb="select"] span {
+        color: #2C2416 !important;
+        font-weight: 600 !important;
     }
     [data-testid="stSidebar"] input,
     [data-testid="stSidebar"] select {
-        color: #F5F0E8 !important;
+        color: #2C2416 !important;
+        background-color: #E9A43A !important;
     }
     [data-testid="stSidebar"] h1,
     [data-testid="stSidebar"] h2,
