@@ -843,7 +843,12 @@ def main():
         st.divider()
         st.markdown("<div class='section-header'>6. SKU detail view</div>", unsafe_allow_html=True)
 
-        selected_sku = st.selectbox("Select SKU to inspect", filtered['SKU'].tolist())
+        selected_sku = st.selectbox(
+            "Search or select a SKU",
+            filtered['SKU'].tolist(),
+            index=0,
+            placeholder="Type to search...",
+        )
 
         if selected_sku:
             sku_row = filtered[filtered['SKU'] == selected_sku].iloc[0]
