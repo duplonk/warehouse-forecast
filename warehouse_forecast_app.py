@@ -74,20 +74,21 @@ st.markdown("""
         border-bottom: 3px solid #E9A43A;
     }
     .oracle-title {
-        font-size: 2.2rem;
+        font-size: 3.8rem;
         font-weight: 700;
         color: #F5F0E8;
         margin: 0;
-        letter-spacing: -0.02em;
+        letter-spacing: -0.03em;
+        line-height: 1;
     }
     .oracle-title span {
         color: #E9A43A;
     }
     .oracle-subtitle {
-        font-size: 0.95rem;
+        font-size: 0.85rem;
         color: #C4B99A;
-        margin: 0.25rem 0 0 0;
-        letter-spacing: 0.08em;
+        margin: 0.4rem 0 0 0;
+        letter-spacing: 0.1em;
         text-transform: uppercase;
     }
     .oracle-badge {
